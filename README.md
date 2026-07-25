@@ -124,7 +124,8 @@ The app starts on `http://127.0.0.1:7777`.
 
 1. **Open a console:**
    - **FoldOS ledger console** (budgets, backtests, counterfactuals, chain verification): [http://localhost:7777/console](http://localhost:7777/console)
-   - **Agno chat/management UI** (agent chat, sessions, traces): open [https://os.agno.com](https://os.agno.com), click **Connect OS → Local**, and enter `http://localhost:7777`.
+   - **Agno chat/management UI (hosted)**: open [https://os.agno.com](https://os.agno.com), click **Connect OS → Local**, and enter `http://localhost:7777`.
+   - **Agno chat/management UI (self-hosted, in this repo)**: see [`ui/README.md`](ui/README.md) — run `scripts/start_agent_ui.sh` after `git submodule update --init --recursive`.
 2. **Run an agent:**
    ```bash
    curl -X POST http://localhost:7777/agents/analyst/runs \
@@ -250,9 +251,10 @@ The script starts the FoldOS service, runs a full scenario (agent run, policy, b
 | Path / URL | Purpose |
 |---|---|
 | `/console` | FoldOS ledger console: events, state, budgets, backtests, counterfactuals, chain verification |
-| `https://os.agno.com` (connected to `http://localhost:7777`) | Agno’s official chat/management UI: agent chat, sessions, traces |
+| `https://os.agno.com` (connected to `http://localhost:7777`) | Agno’s hosted chat/management UI: agent chat, sessions, traces |
+| `ui/agent-ui` (run `scripts/start_agent_ui.sh`) | Self-hosted Agno Agent UI (submodule): same features as above, running locally on port 3000 |
 
-The Agno UI is served externally and connects directly to the running AgentOS backend; CORS is already configured for `https://os.agno.com`.
+Both Agno UIs connect directly to the running AgentOS backend. CORS is already configured for `https://os.agno.com` and `http://localhost:3000`.
 
 ---
 

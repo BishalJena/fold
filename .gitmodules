@@ -1,0 +1,3 @@
+[submodule "ui/agent-ui"]
+	path = ui/agent-ui
+	url = https://github.com/agno-agi/agent-ui.git
