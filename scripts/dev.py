@@ -15,6 +15,16 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 UI_DIR = REPO_ROOT / "ui" / "agent-ui"
 
 
+def _python_executable() -> str:
+    venv_python = REPO_ROOT / ".venv" / "bin" / "python3"
+    if venv_python.exists():
+        return str(venv_python)
+    venv_python_alt = REPO_ROOT / ".venv" / "bin" / "python"
+    if venv_python_alt.exists():
+        return str(venv_python_alt)
+    return sys.executable
+
+
 def _run(cmd: list[str], cwd: Path) -> subprocess.Popen:
     return subprocess.Popen(
         cmd,
@@ -68,7 +78,7 @@ def main() -> None:
     _install_ui_deps()
 
     backend_cmd = [
-        sys.executable,
+        _python_executable(),
         "-m",
         "uvicorn",
         "foldos.app:create_app",
@@ -81,7 +91,7 @@ def main() -> None:
     backend = _run(backend_cmd, REPO_ROOT)
 
     pnpm = _ensure_pnpm()
-    ui_cmd = [pnpm, "dev", "-p", "3000"]
+    ui_cmd = [pnpm, "dev"]
     ui = _run(ui_cmd, UI_DIR)
 
     print()
@@ -94,14 +104,25 @@ def main() -> None:
     print("=" * 60)
     print()
 
-    processes = [backend, ui]
+    processes = {"backend": backend, "ui": ui}
+    exited_name: str | None = None
     try:
-        while all(proc.poll() is None for proc in processes):
+        while True:
+            for name, proc in processes.items():
+                if proc.poll() is not None:
+                    exited_name = name
+                    break
+            if exited_name is not None:
+                break
             time.sleep(0.5)
     except KeyboardInterrupt:
         print("\n[dev] Shutting down...")
+    else:
+        if exited_name is not None:
+            print(f"\n[dev] {exited_name} exited unexpectedly (code {processes[exited_name].returncode}).")
+            print("[dev] Shutting down...")
     finally:
-        _shutdown(processes)
+        _shutdown(list(processes.values()))
         print("[dev] Shutdown complete.")
 
 
