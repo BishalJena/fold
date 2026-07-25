@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-07-25 -- Self-hosted Agent UI fixes
+
+- Added a backend route (`/sessions/{session_id}/runs`) that exposes Agno session history in the format the Agent UI expects, so sidebar sessions load correctly.
+- Added `scripts/agent-ui.patch` and wired `scripts/dev.py` to apply it automatically on first start. The patch fixes three upstream incompatibilities with `agno[os]==2.8.2`:
+  - The "New Chat" button is disabled until messages exist; the patch always enables it.
+  - The UI's stream parser expects raw JSON chunks, but AgentOS streams SSE (`event: ...\ndata: ...`); the patch converts SSE to JSONL before parsing.
+  - The sidebar auto-loads the current session on every `sessionId` change, which overwrites in-flight streamed messages; the patch skips loading while a stream is active.
+- Verified a full chat workflow in the browser: type a message, see the user prompt, the `get_foldos_status` tool call, and the agent's streamed response.
+
 ## 2026-07-25 -- Easier startup
 
 - Added `scripts/dev.py` to start both the FoldOS backend and the Agno Agent UI with one command.

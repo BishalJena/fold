@@ -7,15 +7,16 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from agno.agent.agent import Agent
+from agno.db.base import SessionType
 from agno.models.openai import OpenAILike
 from agno.os import AgentOS
 from agno.os.settings import AgnoAPISettings
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from opentelemetry.sdk.resources import Resource
 
@@ -154,6 +155,64 @@ def create_app() -> FastAPI:
     @application.get("/console")
     async def console_root() -> FileResponse:
         return FileResponse(static_dir / "index.html")
+
+    @application.get("/sessions/{session_id}/runs")
+    async def get_session_runs(
+        session_id: str,
+        type: str | None = None,  # noqa: ARG001
+        db_id: str | None = None,  # noqa: ARG001
+    ) -> JSONResponse:
+        """Return session history as "runs" for the Agno Agent UI."""
+        session = foldos_db.get_session(session_id, session_type=SessionType.AGENT)
+        if session is None:
+            return JSONResponse([])
+        if hasattr(session, "get_chat_history"):
+            history = cast(list[Any], session.get_chat_history())
+        else:
+            history = cast(list[Any], getattr(session, "chat_history", None) or [])
+        if not isinstance(history, list):
+            return JSONResponse([])
+
+        def _get(obj: Any, name: str, default: Any = None) -> Any:
+            if isinstance(obj, dict):
+                return obj.get(name, default)
+            return getattr(obj, name, default)
+
+        runs: list[dict[str, Any]] = []
+        current: dict[str, Any] | None = None
+        for msg in history:
+            role = _get(msg, "role")
+            if role == "user":
+                if current is not None:
+                    runs.append(current)
+                current = {
+                    "run_input": _get(msg, "content", ""),
+                    "created_at": _get(msg, "created_at", 0),
+                    "content": "",
+                    "tools": [],
+                    "extra_data": {},
+                }
+            elif role == "assistant" and current is not None:
+                content = _get(msg, "content") or ""
+                if content:
+                    current["content"] = content
+                for tc in _get(msg, "tool_calls") or []:
+                    fn = _get(tc, "function") or {}
+                    current["tools"].append(
+                        {
+                            "tool_call_id": _get(tc, "id", ""),
+                            "tool_name": _get(fn, "name", ""),
+                            "tool_args": _get(fn, "arguments") or {},
+                            "role": "tool",
+                            "content": "",
+                            "metrics": {"time": 0},
+                            "created_at": _get(msg, "created_at", 0),
+                        }
+                    )
+        if current is not None:
+            runs.append(current)
+
+        return JSONResponse(runs)
 
     application.state.store = store
     application.state.providers = providers

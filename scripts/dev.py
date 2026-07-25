@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 UI_DIR = REPO_ROOT / "ui" / "agent-ui"
@@ -25,7 +26,7 @@ def _python_executable() -> str:
     return sys.executable
 
 
-def _run(cmd: list[str], cwd: Path) -> subprocess.Popen:
+def _run(cmd: list[str], cwd: Path) -> subprocess.Popen[Any]:
     return subprocess.Popen(
         cmd,
         cwd=cwd,
@@ -44,15 +45,34 @@ def _ensure_pnpm() -> str:
     return pnpm
 
 
+def _patch_agent_ui() -> None:
+    """Apply the FoldOS compatibility patch to the vendored Agno Agent UI."""
+    patch_file = REPO_ROOT / "scripts" / "agent-ui.patch"
+    if not patch_file.exists():
+        return
+
+    marker = UI_DIR / "src" / "hooks" / "useAIResponseStream.tsx"
+    if marker.exists() and "let sseBuffer = ''" in marker.read_text():
+        return
+
+    subprocess.run(
+        ["git", "-C", str(UI_DIR), "apply", str(patch_file)],
+        check=True,
+    )
+    print("[dev] Applied Agent UI compatibility patch")
+
+
 def _install_ui_deps() -> None:
     if (UI_DIR / "node_modules").exists():
+        _patch_agent_ui()
         return
     print("[dev] Installing UI dependencies (one-time)...")
     pnpm = _ensure_pnpm()
     subprocess.run([pnpm, "install"], cwd=UI_DIR, check=True)
+    _patch_agent_ui()
 
 
-def _shutdown(processes: list[subprocess.Popen]) -> None:
+def _shutdown(processes: list[subprocess.Popen[Any]]) -> None:
     for proc in processes:
         try:
             os.killpg(os.getpgid(proc.pid), signal.SIGTERM)

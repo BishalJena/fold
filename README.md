@@ -128,9 +128,11 @@ Start the backend and the Agno Agent UI together:
 python3 scripts/dev.py
 ```
 
+`dev.py` installs the UI dependencies on first run and applies a small compatibility patch (`scripts/agent-ui.patch`) so the vendored Agno UI works against the pinned `agno[os]==2.8.2` backend.
+
 Then open:
 
-- **Agno chat/management UI**: [http://localhost:3000](http://localhost:3000) — set the endpoint to `http://localhost:7777` in the sidebar.
+- **Agno chat/management UI**: [http://localhost:3000](http://localhost:3000) — the endpoint is already set to `http://localhost:7777`.
 - **FoldOS ledger console**: [http://localhost:7777/console](http://localhost:7777/console) — budgets, backtests, counterfactuals, chain verification.
 - **SigNoz**: [http://localhost:8080](http://localhost:8080) — search for service `foldos`.
 

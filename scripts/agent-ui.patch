@@ -1,0 +1,122 @@
+diff --git a/src/components/chat/Sidebar/NewChatButton.tsx b/src/components/chat/Sidebar/NewChatButton.tsx
+index 436f02c..b7e1c47 100644
+--- a/src/components/chat/Sidebar/NewChatButton.tsx
++++ b/src/components/chat/Sidebar/NewChatButton.tsx
+@@ -12,7 +12,7 @@ function NewChatButton() {
+     <Button
+       className="z-10 cursor-pointer rounded bg-brand px-4 py-2 font-bold text-primary hover:bg-brand/80 disabled:cursor-not-allowed disabled:opacity-50"
+       onClick={clearChat}
+-      disabled={messages.length === 0}
++      disabled={false}
+     >
+       <div className="flex items-center gap-2">
+         <p>New Chat</p>{' '}
+diff --git a/src/components/chat/Sidebar/Sessions/Sessions.tsx b/src/components/chat/Sidebar/Sessions/Sessions.tsx
+index 88421f7..e263c83 100644
+--- a/src/components/chat/Sidebar/Sessions/Sessions.tsx
++++ b/src/components/chat/Sidebar/Sessions/Sessions.tsx
+@@ -48,7 +48,8 @@ const Sessions = () => {
+     hydrated,
+     sessionsData,
+     setSessionsData,
+-    isSessionsLoading
++    isSessionsLoading,
++    isStreaming
+   } = useStore()
+ 
+   const [isScrolling, setIsScrolling] = useState(false)
+@@ -81,12 +82,18 @@ const Sessions = () => {
+   }, [])
+ 
+   useEffect(() => {
+-    if (hydrated && sessionId && selectedEndpoint && (agentId || teamId)) {
++    if (
++      hydrated &&
++      sessionId &&
++      selectedEndpoint &&
++      (agentId || teamId) &&
++      !isStreaming
++    ) {
+       const entityType = agentId ? 'agent' : 'team'
+       getSession({ entityType, agentId, teamId, dbId }, sessionId)
+     }
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+-  }, [hydrated, sessionId, selectedEndpoint, agentId, teamId, dbId])
++  }, [hydrated, sessionId, selectedEndpoint, agentId, teamId, dbId, isStreaming])
+ 
+   useEffect(() => {
+     if (!selectedEndpoint || isEndpointLoading) return
+diff --git a/src/components/chat/Sidebar/Sidebar.tsx b/src/components/chat/Sidebar/Sidebar.tsx
+index 461651a..dc1aed6 100644
+--- a/src/components/chat/Sidebar/Sidebar.tsx
++++ b/src/components/chat/Sidebar/Sidebar.tsx
+@@ -265,7 +265,7 @@ const Sidebar = ({
+       >
+         <SidebarHeader />
+         <NewChatButton
+-          disabled={messages.length === 0}
++          disabled={false}
+           onClick={handleNewChat}
+         />
+         {isMounted && (
+diff --git a/src/hooks/useAIResponseStream.tsx b/src/hooks/useAIResponseStream.tsx
+index c4390e7..bba0612 100644
+--- a/src/hooks/useAIResponseStream.tsx
++++ b/src/hooks/useAIResponseStream.tsx
+@@ -224,17 +224,39 @@ export default function useAIResponseStream() {
+         const reader = response.body.getReader()
+         const decoder = new TextDecoder()
+ 
++        let sseBuffer = ''
++        const flushSSE = () => {
++          const events: string[] = []
++          let endIndex = sseBuffer.indexOf('\n\n')
++          while (endIndex !== -1) {
++            const block = sseBuffer.slice(0, endIndex)
++            sseBuffer = sseBuffer.slice(endIndex + 2)
++            const dataLine = block
++              .split('\n')
++              .find((line) => line.startsWith('data: '))
++            if (dataLine) {
++              events.push(dataLine.slice(6))
++            }
++            endIndex = sseBuffer.indexOf('\n\n')
++          }
++          if (events.length > 0) {
++            buffer += events.join('\n') + '\n'
++          }
++        }
++
+         // Recursively process the stream.
+         const processStream = async (): Promise<void> => {
+           const { done, value } = await reader.read()
+           if (done) {
++            flushSSE()
+             // Process any final data in the buffer.
+             buffer = parseBuffer(buffer, onChunk)
+             onComplete()
+             return
+           }
+-          // Decode, sanitize, and accumulate the chunk
+-          buffer += decoder.decode(value, { stream: true })
++          // Decode raw SSE bytes and accumulate until we have full event blocks.
++          sseBuffer += decoder.decode(value, { stream: true })
++          flushSSE()
+ 
+           // Parse any complete JSON objects available in the buffer.
+           buffer = parseBuffer(buffer, onChunk)
+diff --git a/src/hooks/useSessionLoader.tsx b/src/hooks/useSessionLoader.tsx
+index 947eaf0..42a6682 100644
+--- a/src/hooks/useSessionLoader.tsx
++++ b/src/hooks/useSessionLoader.tsx
+@@ -155,7 +155,9 @@ const useSessionLoader = () => {
+               }
+             )
+ 
+-            setMessages(processedMessages)
++            if (processedMessages.length > 0) {
++              setMessages(processedMessages)
++            }
+             return processedMessages
+           }
+         }
