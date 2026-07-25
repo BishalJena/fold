@@ -1,6 +1,14 @@
 # Changelog
 
-## 2026-07-25 -- Final verification fixes
+## 2026-07-25 -- Agno Agent UI integration
+
+- Added Agno's open-source `agent-ui` as a Git submodule under `ui/agent-ui`.
+- Created `ui/README.md` and `scripts/start_agent_ui.sh` to run the self-hosted Agno chat/management UI on port 3000.
+- Verified the UI dev server starts and serves on `http://localhost:3000`.
+- Confirmed CORS from the FoldOS backend already allows `http://localhost:3000`.
+- Updated `README.md` quickstart and consoles section to document both the hosted `os.agno.com` UI and the self-hosted option.
+
+## 2025-07-25 -- Initial build
 
 ### Cost estimation and budget governance
 
