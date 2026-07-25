@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-25 -- Easier startup
+
+- Added `scripts/dev.py` to start both the FoldOS backend and the Agno Agent UI with one command.
+- Added `Makefile` with `dev`, `backend`, `ui`, `test`, and `lint` targets.
+- Verified `python scripts/dev.py` boots both services and both respond 200.
+- Updated `README.md` quickstart to lead with the one-command startup.
+
 ## 2026-07-25 -- Agno Agent UI integration
 
 - Added Agno's open-source `agent-ui` as a Git submodule under `ui/agent-ui`.

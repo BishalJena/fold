@@ -122,27 +122,38 @@ The app starts on `http://127.0.0.1:7777`.
 
 ## Quickstart
 
-1. **Open a console:**
-   - **FoldOS ledger console** (budgets, backtests, counterfactuals, chain verification): [http://localhost:7777/console](http://localhost:7777/console)
-   - **Agno chat/management UI (hosted)**: open [https://os.agno.com](https://os.agno.com), click **Connect OS → Local**, and enter `http://localhost:7777`.
-   - **Agno chat/management UI (self-hosted, in this repo)**: see [`ui/README.md`](ui/README.md) — run `scripts/start_agent_ui.sh` after `git submodule update --init --recursive`.
-2. **Run an agent:**
-   ```bash
-   curl -X POST http://localhost:7777/agents/analyst/runs \
-     -F "message=Say hello in one word." \
-     -F "session_id=quickstart-1" \
-     -F "stream=false"
-   ```
-3. **See events in the ledger:**
-   ```bash
-   curl http://localhost:7777/foldos/events/quickstart-1 | python -m json.tool
-   ```
-4. **Verify chain integrity:**
-   ```bash
-   curl http://localhost:7777/foldos/verify/quickstart-1
-   # {"ok": true, "broken_at": null, "events": ...}
-   ```
-5. **See traces in SigNoz:** Open [http://localhost:8080](http://localhost:8080) and search for service `foldos`.
+Start the backend and the Agno Agent UI together:
+
+```bash
+python scripts/dev.py
+```
+
+Then open:
+
+- **Agno chat/management UI**: [http://localhost:3000](http://localhost:3000) — set the endpoint to `http://localhost:7777` in the sidebar.
+- **FoldOS ledger console**: [http://localhost:7777/console](http://localhost:7777/console) — budgets, backtests, counterfactuals, chain verification.
+- **SigNoz**: [http://localhost:8080](http://localhost:8080) — search for service `foldos`.
+
+Or run the services individually:
+
+```bash
+make backend   # FoldOS backend on port 7777
+make ui        # Agno UI on port 3000
+```
+
+### Try the API
+
+```bash
+curl -X POST http://localhost:7777/agents/analyst/runs \
+  -F "message=Say hello in one word." \
+  -F "session_id=quickstart-1" \
+  -F "stream=false"
+
+curl http://localhost:7777/foldos/events/quickstart-1 | python -m json.tool
+
+curl http://localhost:7777/foldos/verify/quickstart-1
+# {"ok": true, "broken_at": null, "events": ...}
+```
 
 ---
 
@@ -255,6 +266,8 @@ The script starts the FoldOS service, runs a full scenario (agent run, policy, b
 | `ui/agent-ui` (run `scripts/start_agent_ui.sh`) | Self-hosted Agno Agent UI (submodule): same features as above, running locally on port 3000 |
 
 Both Agno UIs connect directly to the running AgentOS backend. CORS is already configured for `https://os.agno.com` and `http://localhost:3000`.
+
+Run everything at once with `python scripts/dev.py` or `make dev`.
 
 ---
 
