@@ -122,7 +122,9 @@ The app starts on `http://127.0.0.1:7777`.
 
 ## Quickstart
 
-1. **Open the console:** [http://localhost:7777/console](http://localhost:7777/console)
+1. **Open a console:**
+   - **FoldOS ledger console** (budgets, backtests, counterfactuals, chain verification): [http://localhost:7777/console](http://localhost:7777/console)
+   - **Agno chat/management UI** (agent chat, sessions, traces): open [https://os.agno.com](https://os.agno.com), click **Connect OS → Local**, and enter `http://localhost:7777`.
 2. **Run an agent:**
    ```bash
    curl -X POST http://localhost:7777/agents/analyst/runs \
@@ -243,11 +245,14 @@ The script starts the FoldOS service, runs a full scenario (agent run, policy, b
 | POST | `/foldos/counterfactual` | Branch + replace one event + compare states |
 | POST | `/foldos/replay` | Replay a session with a new prompt (if runner configured) |
 
-### Console
+### Consoles
 
-| Path | Description |
+| Path / URL | Purpose |
 |---|---|
-| `/console` | Interactive web console for session exploration |
+| `/console` | FoldOS ledger console: events, state, budgets, backtests, counterfactuals, chain verification |
+| `https://os.agno.com` (connected to `http://localhost:7777`) | Agno’s official chat/management UI: agent chat, sessions, traces |
+
+The Agno UI is served externally and connects directly to the running AgentOS backend; CORS is already configured for `https://os.agno.com`.
 
 ---
 
