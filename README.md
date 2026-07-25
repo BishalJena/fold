@@ -125,7 +125,7 @@ The app starts on `http://127.0.0.1:7777`.
 Start the backend and the Agno Agent UI together:
 
 ```bash
-python scripts/dev.py
+python3 scripts/dev.py
 ```
 
 Then open:
@@ -149,7 +149,7 @@ curl -X POST http://localhost:7777/agents/analyst/runs \
   -F "session_id=quickstart-1" \
   -F "stream=false"
 
-curl http://localhost:7777/foldos/events/quickstart-1 | python -m json.tool
+curl http://localhost:7777/foldos/events/quickstart-1 | python3 -m json.tool
 
 curl http://localhost:7777/foldos/verify/quickstart-1
 # {"ok": true, "broken_at": null, "events": ...}
@@ -267,7 +267,7 @@ The script starts the FoldOS service, runs a full scenario (agent run, policy, b
 
 Both Agno UIs connect directly to the running AgentOS backend. CORS is already configured for `https://os.agno.com` and `http://localhost:3000`.
 
-Run everything at once with `python scripts/dev.py` or `make dev`.
+Run everything at once with `python3 scripts/dev.py` or `make dev`.
 
 ---
 

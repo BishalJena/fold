@@ -1,10 +1,10 @@
 .PHONY: dev backend ui test lint
 
 dev:
-	python scripts/dev.py
+	python3 scripts/dev.py
 
 backend:
-	python -m uvicorn foldos.app:create_app --factory --host 127.0.0.1 --port 7777
+	python3 -m uvicorn foldos.app:create_app --factory --host 127.0.0.1 --port 7777
 
 ui:
 	scripts/start_agent_ui.sh
