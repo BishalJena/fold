@@ -1,0 +1,98 @@
+{
+  "alert": "FoldOS policy violation",
+  "alertType": "METRIC_BASED_ALERT",
+  "ruleType": "threshold_rule",
+  "schemaVersion": "v2alpha1",
+  "version": "v5",
+  "description": "Fires whenever a FoldOS policy violation counter is observed.",
+  "condition": {
+    "compositeQuery": {
+      "queryType": "builder",
+      "panelType": "graph",
+      "unit": "none",
+      "queries": [
+        {
+          "type": "builder_query",
+          "spec": {
+            "name": "A",
+            "signal": "metrics",
+            "stepInterval": 60,
+            "aggregations": [
+              {
+                "metricName": "foldos.policy.violations",
+                "reduceTo": "sum",
+                "spaceAggregation": "sum",
+                "timeAggregation": "sum"
+              }
+            ],
+            "filter": {
+              "expression": ""
+            },
+            "groupBy": [
+              {
+                "name": "agent",
+                "fieldDataType": "string",
+                "fieldContext": "tag"
+              },
+              {
+                "name": "session",
+                "fieldDataType": "string",
+                "fieldContext": "tag"
+              },
+              {
+                "name": "policy",
+                "fieldDataType": "string",
+                "fieldContext": "tag"
+              }
+            ],
+            "having": {
+              "expression": ""
+            },
+            "legend": "{{agent}} / {{session}} / {{policy}}"
+          }
+        }
+      ]
+    },
+    "selectedQueryName": "A",
+    "thresholds": {
+      "kind": "basic",
+      "spec": [
+        {
+          "name": "critical",
+          "op": "above",
+          "target": 0,
+          "matchType": "at_least_once",
+          "channels": []
+        }
+      ]
+    }
+  },
+  "evaluation": {
+    "kind": "rolling",
+    "spec": {
+      "evalWindow": "5m",
+      "frequency": "1m"
+    }
+  },
+  "labels": {
+    "severity": "critical",
+    "team": "foldos"
+  },
+  "annotations": {
+    "summary": "FoldOS policy violation detected",
+    "description": "Policy {{$policy}} violated in agent {{$agent}} / session {{$session}}."
+  },
+  "notificationSettings": {
+    "groupBy": [
+      "agent",
+      "session",
+      "policy"
+    ],
+    "usePolicy": true,
+    "renotify": {
+      "enabled": false,
+      "interval": "30m",
+      "alertStates": []
+    }
+  }
+}

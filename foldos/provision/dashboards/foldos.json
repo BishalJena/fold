@@ -1,0 +1,834 @@
+{
+  "schemaVersion": "v6",
+  "name": "foldos-governance",
+  "tags": [],
+  "spec": {
+    "display": {
+      "name": "foldos-governance",
+      "description": "FoldOS governance dashboard covering LLM usage, tool calls, policy violations and chain head state."
+    },
+    "duration": "1h",
+    "variables": [],
+    "links": [],
+    "panels": {
+      "llm-calls": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "LLM calls",
+            "description": "Count of LLM calls grouped by agent, session and model."
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "fillSpans": false
+              },
+              "legend": {
+                "position": "bottom"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "signal": "metrics",
+                    "stepInterval": 60,
+                    "aggregations": [
+                      {
+                        "metricName": "foldos.llm.calls",
+                        "reduceTo": "sum",
+                        "spaceAggregation": "sum",
+                        "timeAggregation": "rate"
+                      }
+                    ],
+                    "filter": {
+                      "expression": ""
+                    },
+                    "groupBy": [
+                      {
+                        "name": "agent",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "session",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "model",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      }
+                    ],
+                    "having": {
+                      "expression": ""
+                    },
+                    "legend": "{{agent}} / {{session}} / {{model}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "llm-input": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "LLM input tokens",
+            "description": "Sum of LLM input tokens grouped by agent, session and model."
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "fillSpans": false
+              },
+              "legend": {
+                "position": "bottom"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "signal": "metrics",
+                    "stepInterval": 60,
+                    "aggregations": [
+                      {
+                        "metricName": "foldos.llm.input_tokens",
+                        "reduceTo": "sum",
+                        "spaceAggregation": "sum",
+                        "timeAggregation": "rate"
+                      }
+                    ],
+                    "filter": {
+                      "expression": ""
+                    },
+                    "groupBy": [
+                      {
+                        "name": "agent",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "session",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "model",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      }
+                    ],
+                    "having": {
+                      "expression": ""
+                    },
+                    "legend": "{{agent}} / {{session}} / {{model}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "llm-output": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "LLM output tokens",
+            "description": "Sum of LLM output tokens grouped by agent, session and model."
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "fillSpans": false
+              },
+              "legend": {
+                "position": "bottom"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "signal": "metrics",
+                    "stepInterval": 60,
+                    "aggregations": [
+                      {
+                        "metricName": "foldos.llm.output_tokens",
+                        "reduceTo": "sum",
+                        "spaceAggregation": "sum",
+                        "timeAggregation": "rate"
+                      }
+                    ],
+                    "filter": {
+                      "expression": ""
+                    },
+                    "groupBy": [
+                      {
+                        "name": "agent",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "session",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "model",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      }
+                    ],
+                    "having": {
+                      "expression": ""
+                    },
+                    "legend": "{{agent}} / {{session}} / {{model}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "llm-cost": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "LLM cost",
+            "description": "Total LLM cost grouped by agent, session and model."
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "fillSpans": false
+              },
+              "legend": {
+                "position": "bottom"
+              },
+              "formatting": {
+                "unit": "USD",
+                "decimalPrecision": "4"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "signal": "metrics",
+                    "stepInterval": 60,
+                    "aggregations": [
+                      {
+                        "metricName": "foldos.llm.cost_usd",
+                        "reduceTo": "sum",
+                        "spaceAggregation": "sum",
+                        "timeAggregation": "rate"
+                      }
+                    ],
+                    "filter": {
+                      "expression": ""
+                    },
+                    "groupBy": [
+                      {
+                        "name": "agent",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "session",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "model",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      }
+                    ],
+                    "having": {
+                      "expression": ""
+                    },
+                    "legend": "{{agent}} / {{session}} / {{model}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "llm-latency": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "LLM latency",
+            "description": "p95 LLM latency grouped by agent, session and model."
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "fillSpans": false
+              },
+              "legend": {
+                "position": "bottom"
+              },
+              "formatting": {
+                "unit": "ms",
+                "decimalPrecision": "2"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "signal": "metrics",
+                    "stepInterval": 60,
+                    "aggregations": [
+                      {
+                        "metricName": "foldos.llm.latency_ms",
+                        "reduceTo": "avg",
+                        "spaceAggregation": "p95",
+                        "timeAggregation": "avg"
+                      }
+                    ],
+                    "filter": {
+                      "expression": ""
+                    },
+                    "groupBy": [
+                      {
+                        "name": "agent",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "session",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "model",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      }
+                    ],
+                    "having": {
+                      "expression": ""
+                    },
+                    "legend": "{{agent}} / {{session}} / {{model}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "tool-calls": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Tool calls",
+            "description": "Count of tool calls grouped by agent, session, tool and error status."
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "fillSpans": false
+              },
+              "legend": {
+                "position": "bottom"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "signal": "metrics",
+                    "stepInterval": 60,
+                    "aggregations": [
+                      {
+                        "metricName": "foldos.tool.calls",
+                        "reduceTo": "sum",
+                        "spaceAggregation": "sum",
+                        "timeAggregation": "rate"
+                      }
+                    ],
+                    "filter": {
+                      "expression": ""
+                    },
+                    "groupBy": [
+                      {
+                        "name": "agent",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "session",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "tool",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "error",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      }
+                    ],
+                    "having": {
+                      "expression": ""
+                    },
+                    "legend": "{{agent}} / {{session}} / {{tool}} / error={{error}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "tool-errors": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Tool errors",
+            "description": "Tool calls where the error attribute is true, grouped by agent, session and tool."
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "fillSpans": false
+              },
+              "legend": {
+                "position": "bottom"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "signal": "metrics",
+                    "stepInterval": 60,
+                    "aggregations": [
+                      {
+                        "metricName": "foldos.tool.calls",
+                        "reduceTo": "sum",
+                        "spaceAggregation": "sum",
+                        "timeAggregation": "rate"
+                      }
+                    ],
+                    "filter": {
+                      "expression": "error = 'true'"
+                    },
+                    "groupBy": [
+                      {
+                        "name": "agent",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "session",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "tool",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      }
+                    ],
+                    "having": {
+                      "expression": ""
+                    },
+                    "legend": "{{agent}} / {{session}} / {{tool}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "policy-violations": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Policy violations",
+            "description": "FoldOS policy violations grouped by agent, session and policy key."
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "fillSpans": false
+              },
+              "legend": {
+                "position": "bottom"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "signal": "metrics",
+                    "stepInterval": 60,
+                    "aggregations": [
+                      {
+                        "metricName": "foldos.policy.violations",
+                        "reduceTo": "sum",
+                        "spaceAggregation": "sum",
+                        "timeAggregation": "rate"
+                      }
+                    ],
+                    "filter": {
+                      "expression": ""
+                    },
+                    "groupBy": [
+                      {
+                        "name": "agent",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "session",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "policy",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      }
+                    ],
+                    "having": {
+                      "expression": ""
+                    },
+                    "legend": "{{agent}} / {{session}} / {{policy}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "chain-head-seq": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Chain head sequence",
+            "description": "Latest chain head sequence grouped by agent and session."
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "fillSpans": false
+              },
+              "legend": {
+                "position": "bottom"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "signal": "metrics",
+                    "stepInterval": 60,
+                    "aggregations": [
+                      {
+                        "metricName": "foldos.chain.head_seq",
+                        "reduceTo": "max",
+                        "spaceAggregation": "max",
+                        "timeAggregation": "latest"
+                      }
+                    ],
+                    "filter": {
+                      "expression": ""
+                    },
+                    "groupBy": [
+                      {
+                        "name": "agent",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "session",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      }
+                    ],
+                    "having": {
+                      "expression": ""
+                    },
+                    "legend": "{{agent}} / {{session}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "chain-head-hash": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Chain head hash",
+            "description": "Latest chain head hash grouped by agent, session and hash value."
+          },
+          "plugin": {
+            "kind": "signoz/TimeSeriesPanel",
+            "spec": {
+              "visualization": {
+                "fillSpans": false
+              },
+              "legend": {
+                "position": "bottom"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "time_series",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/BuilderQuery",
+                  "spec": {
+                    "name": "A",
+                    "signal": "metrics",
+                    "stepInterval": 60,
+                    "aggregations": [
+                      {
+                        "metricName": "foldos.chain.head_hash",
+                        "reduceTo": "sum",
+                        "spaceAggregation": "sum",
+                        "timeAggregation": "latest"
+                      }
+                    ],
+                    "filter": {
+                      "expression": ""
+                    },
+                    "groupBy": [
+                      {
+                        "name": "agent",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "session",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      },
+                      {
+                        "name": "hash",
+                        "fieldDataType": "string",
+                        "fieldContext": "tag"
+                      }
+                    ],
+                    "having": {
+                      "expression": ""
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "foldos-logs": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "FoldOS logs",
+            "description": "FoldOS log records, filtered to the foldos service."
+          },
+          "plugin": {
+            "kind": "signoz/LogsTablePanel",
+            "spec": {}
+          },
+          "queries": [
+            {
+              "kind": "logs",
+              "spec": {
+                "plugin": {
+                  "kind": "signoz/LogsQuery",
+                  "spec": {
+                    "name": "A",
+                    "signal": "logs",
+                    "filter": {
+                      "expression": "service.name = 'foldos'"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "layouts": [
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "FoldOS governance"
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/llm-calls"
+              }
+            },
+            {
+              "x": 4,
+              "y": 0,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/llm-input"
+              }
+            },
+            {
+              "x": 8,
+              "y": 0,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/llm-output"
+              }
+            },
+            {
+              "x": 0,
+              "y": 4,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/llm-cost"
+              }
+            },
+            {
+              "x": 4,
+              "y": 4,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/llm-latency"
+              }
+            },
+            {
+              "x": 8,
+              "y": 4,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/tool-calls"
+              }
+            },
+            {
+              "x": 0,
+              "y": 8,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/tool-errors"
+              }
+            },
+            {
+              "x": 4,
+              "y": 8,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/policy-violations"
+              }
+            },
+            {
+              "x": 8,
+              "y": 8,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/chain-head-seq"
+              }
+            },
+            {
+              "x": 0,
+              "y": 12,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/chain-head-hash"
+              }
+            },
+            {
+              "x": 4,
+              "y": 12,
+              "width": 8,
+              "height": 6,
+              "content": {
+                "$ref": "#/spec/panels/foldos-logs"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

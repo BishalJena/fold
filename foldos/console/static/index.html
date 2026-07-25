@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FoldOS Console</title>
+  <link rel="stylesheet" href="/console/static/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <h1>FoldOS Console</h1>
+      <span id="integrity-badge" class="badge badge-loading">checking…</span>
+      <span class="integrity-note">Chain mutation can be tested by mutating the in-memory store directly in Python.</span>
+    </div>
+    <div class="session-control">
+      <label for="tenant">Tenant</label>
+      <input id="tenant" type="text" value="acme" />
+      <label for="agent">Agent</label>
+      <input id="agent" type="text" value="analyst" />
+      <label for="session">Session</label>
+      <input id="session" type="text" value="default" />
+      <label for="thread">Thread</label>
+      <input id="thread" type="text" value="main" list="thread-list" />
+      <datalist id="thread-list"></datalist>
+      <button id="load-btn">Load</button>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="panel span-2 threads-panel">
+      <h2>Known Threads</h2>
+      <div id="threads" class="thread-list"></div>
+    </section>
+
+    <section class="panel state-panel">
+      <h2>State</h2>
+      <pre id="state">{}</pre>
+    </section>
+
+    <section class="panel events-panel">
+      <h2>Events</h2>
+      <div class="scrub">
+        <label for="as-of">as_of <span id="as-of-label">live</span></label>
+        <input id="as-of" type="range" min="0" max="0" value="0" />
+        <button id="reset-as-of" type="button">Live</button>
+      </div>
+      <ul id="events"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Policy / Budget</h2>
+      <div class="form-row">
+        <input id="budget" type="number" step="0.01" min="0" placeholder="Budget USD" />
+        <button id="set-budget" type="button">Set budget</button>
+      </div>
+      <div id="usage-summary" class="usage-summary"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Backtest</h2>
+      <div class="form-row">
+        <input id="backtest-budget" type="number" step="0.01" min="0" placeholder="Candidate budget" />
+        <button id="run-backtest" type="button">Backtest policy</button>
+      </div>
+      <ul id="backtest-results" class="backtest-results"></ul>
+    </section>
+
+    <section class="panel span-2">
+      <h2>Counterfactual</h2>
+      <p id="cf-selection" class="muted">Select an event from the Events panel to rewrite it.</p>
+      <div class="cf-form">
+        <textarea id="cf-payload" rows="5" placeholder="Selected event payload will appear here…"></textarea>
+        <input id="cf-thread" type="text" placeholder="New thread name" />
+        <button id="cf-fork" type="button" disabled>Fork & rewrite</button>
+      </div>
+      <div id="cf-result" class="cf-result"></div>
+    </section>
+
+    <section class="panel span-2">
+      <h2>Send Message</h2>
+      <form id="message-form">
+        <input id="content" type="text" placeholder="Type a message…" required />
+        <button type="submit">Send</button>
+      </form>
+      <p id="status" class="status"></p>
+    </section>
+  </main>
+
+  <script src="/console/static/app.js"></script>
+</body>
+</html>
